@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>きのこ vs たけのこ</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Impact&family=Noto+Sans+JP:wght@900&display=swap');
@@ -31,6 +31,7 @@
             color: #fff;
             overflow: hidden;
             height: 100vh;
+            height: 100dvh; /* スマホのブラウザバー対策 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -344,7 +345,6 @@
             0% { opacity: 0.5; box-shadow: 0 0 15px #fff; }
             100% { opacity: 1; box-shadow: 0 0 40px #fff, 0 0 50px var(--accent-gold); }
         }
-        /* ======================================= */
 
         .footer-container {
             display: flex;
@@ -365,10 +365,8 @@
             color: #778;
         }
 
-        .rollback-btn {
-            background: #222;
+        .rollback-btn, .reset-btn {
             color: #fff;
-            border: 3px solid #666;
             padding: 10px 20px;
             border-radius: 30px;
             font-family: inherit;
@@ -378,23 +376,18 @@
             box-shadow: 0 5px 0px #000;
             transition: 0.1s;
         }
+        
+        .rollback-btn {
+            background: #222;
+            border: 3px solid #666;
+        }
         .rollback-btn:hover { background: #444; border-color: #888; }
         .rollback-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px #000; }
         .rollback-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* リセットボタンのスタイル */
         .reset-btn {
             background: #550000;
-            color: #fff;
             border: 3px solid #880000;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-family: inherit;
-            font-weight: 900;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: 0 5px 0px #000;
-            transition: 0.1s;
         }
         .reset-btn:hover { background: #770000; border-color: #aa0000; }
         .reset-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px #000; }
@@ -433,6 +426,95 @@
         @keyframes dropletFly {
             0% { transform: translate(0, 0) scale(1); opacity: 1; }
             100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+        }
+
+        /* =========================================================
+           スマホ向けレスポンシブ（画面幅768px以下の場合）
+           ========================================================= */
+        @media screen and (max-width: 768px) {
+            body {
+                gap: 15px;
+                padding: 10px;
+            }
+            .battle-ground {
+                height: 85vh; /* スマホ用に縦幅を少し拡張 */
+                justify-content: flex-start;
+                gap: 20px;
+            }
+            .teams-container {
+                height: auto;
+                align-items: stretch;
+            }
+            .team-zone {
+                width: 48%; /* 横に2つ並べる */
+                flex-direction: column; /* 画像・文字・ボタンを縦並びに */
+                justify-content: center;
+                gap: 10px;
+                padding: 15px 10px;
+                border-width: 8px;
+                border-radius: 20px;
+            }
+            
+            /* スマホで表示順序を「画像 → 名前 → ボタン」に強制統一 */
+            .image-box { order: 1; width: 70px; height: 70px; margin: 0 auto; }
+            .team-label { order: 2; font-size: 1.4rem; letter-spacing: 0; text-align: center; }
+            .splat-btn { order: 3; font-size: 1.2rem; padding: 10px; width: 90%; margin: 0 auto; transform: skewX(-5deg); }
+
+            .bottom-meter-area {
+                height: auto;
+                flex-grow: 1;
+                margin-top: 0;
+            }
+            .meter-top-info {
+                margin-bottom: 10px;
+            }
+            .score-label {
+                font-size: 0.7rem;
+                letter-spacing: 0;
+            }
+            .score-number {
+                font-size: 2.2rem;
+            }
+            .score-unit {
+                font-size: 1rem;
+            }
+            .percent-badge {
+                font-size: 1.2rem;
+                padding: 2px 6px;
+            }
+            .lead-container {
+                top: 0;
+                transform: translateX(-50%) scale(0.65); /* スマホ用に縮小 */
+            }
+            
+            /* メーターをスマホ用に少し細く */
+            .splat-meter-frame-horizontal {
+                height: 80px;
+                border-width: 8px;
+                border-radius: 25px;
+            }
+            .kinoko-liquid-layer-horizontal {
+                border-right-width: 6px;
+            }
+            .kinoko-liquid-layer-horizontal::after {
+                width: 6px;
+                right: -6px;
+            }
+
+            .footer-container {
+                gap: 10px;
+                flex-wrap: wrap; /* 画面幅が狭い場合は折り返し */
+                justify-content: center;
+            }
+            .rollback-btn, .reset-btn {
+                font-size: 0.95rem;
+                padding: 10px 15px;
+                border-width: 2px;
+                box-shadow: 0 4px 0px #000;
+            }
+            footer {
+                display: none; /* スマホでは画面を広く使うため装飾フッターは非表示 */
+            }
         }
     </style>
 </head>
@@ -543,7 +625,7 @@
         document.getElementById('btn-kinoko').addEventListener('click', (e) => handleVote('kinoko', e));
         document.getElementById('btn-takenoko').addEventListener('click', (e) => handleVote('takenoko', e));
         document.getElementById('btn-rollback').addEventListener('click', handleRollback);
-        document.getElementById('btn-reset').addEventListener('click', handleReset); // リセットボタンのイベント追加
+        document.getElementById('btn-reset').addEventListener('click', handleReset);
 
         function handleVote(team, event) {
             myVoteHistory.push(team); 
@@ -588,18 +670,15 @@
             }
         }
 
-        // --- 全リセット処理 ---
         function handleReset() {
             if (!confirm("本当にすべての票をリセットして 0 にしますか？")) {
-                return; // キャンセルされたら何もしない
+                return; 
             }
 
-            // 自分の投票履歴もリセット
             myVoteHistory = [];
             document.getElementById('btn-rollback').disabled = true;
 
             if (ENABLE_SYNC) {
-                // Firebase上のデータを {kinoko: 0, takenoko: 0} で上書き
                 set(dbRef, { kinoko: 0, takenoko: 0 });
             } else {
                 score.kinoko = 0;
