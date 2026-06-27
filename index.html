@@ -382,6 +382,23 @@
         .rollback-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px #000; }
         .rollback-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        /* リセットボタンのスタイル */
+        .reset-btn {
+            background: #550000;
+            color: #fff;
+            border: 3px solid #880000;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 5px 0px #000;
+            transition: 0.1s;
+        }
+        .reset-btn:hover { background: #770000; border-color: #aa0000; }
+        .reset-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px #000; }
+
         .macro-shake { animation: crazyShake 0.4s ease-out; }
         @keyframes crazyShake {
             0% { transform: translate(0,0); }
@@ -478,19 +495,20 @@
 
     <div class="footer-container">
         <button class="rollback-btn" id="btn-rollback" disabled>↩ 1票取り消す</button>
+        <button class="reset-btn" id="btn-reset">💥 全リセット</button>
         <footer>VOTE RESULT SYSTEM</footer>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, onValue, runTransaction, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         // ==========================================
         // Firebase同期を有効化！
         // ==========================================
         const ENABLE_SYNC = true; 
 
-        // ご提示いただいた設定を組み込みました
+        // ご提示いただいた設定
         const firebaseConfig = {
             apiKey: "AIzaSyD6_zG0RElcpgS_755xfJTa02W6szeebI0",
             authDomain: "election-47a58.firebaseapp.com",
@@ -525,6 +543,7 @@
         document.getElementById('btn-kinoko').addEventListener('click', (e) => handleVote('kinoko', e));
         document.getElementById('btn-takenoko').addEventListener('click', (e) => handleVote('takenoko', e));
         document.getElementById('btn-rollback').addEventListener('click', handleRollback);
+        document.getElementById('btn-reset').addEventListener('click', handleReset); // リセットボタンのイベント追加
 
         function handleVote(team, event) {
             myVoteHistory.push(team); 
@@ -565,6 +584,26 @@
                 });
             } else {
                 if (score[lastVote] > 0) score[lastVote] -= 1;
+                calcResult();
+            }
+        }
+
+        // --- 全リセット処理 ---
+        function handleReset() {
+            if (!confirm("本当にすべての票をリセットして 0 にしますか？")) {
+                return; // キャンセルされたら何もしない
+            }
+
+            // 自分の投票履歴もリセット
+            myVoteHistory = [];
+            document.getElementById('btn-rollback').disabled = true;
+
+            if (ENABLE_SYNC) {
+                // Firebase上のデータを {kinoko: 0, takenoko: 0} で上書き
+                set(dbRef, { kinoko: 0, takenoko: 0 });
+            } else {
+                score.kinoko = 0;
+                score.takenoko = 0;
                 calcResult();
             }
         }
