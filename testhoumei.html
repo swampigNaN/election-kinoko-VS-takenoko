@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿命のチョコ決戦！きのこ vs たけのこ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Impact&family=Noto+Sans+JP:wght@900&display=swap');
+
+        :root {
+            --bg-dark: #120600;
+            /* コントラストを強めるために色を調整しました */
+            --kinoko-dark: #140702;     /* より深いビターチョコ色 */
+            --kinoko-main: #6b3114;     /* より明るいミルクチョコ色 */
+            --takenoko-dark: #1b4d22;
+            --takenoko-main: #2e7d32;   
+            --biscuit: #f7ce86;
+            --biscuit-shadow: #cfa153;
+            --accent-gold: #ffd700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Impact', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-dark);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            inset: -100%;
+            background: 
+                linear-gradient(45deg, #1c0b02 25%, transparent 25%), 
+                linear-gradient(-45deg, #1c0b02 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #1c0b02 75%), 
+                linear-gradient(-45deg, transparent 75%, #1c0b02 75%);
+            background-size: 80px 80px;
+            background-position: 0 0;
+            z-index: -3;
+            transform: rotate(-5deg);
+            animation: fastBgScroll 6s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes fastBgScroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 320px 320px; }
+        }
+
+        .ambient-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            animation: floatUp 6s infinite linear;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(0.3); opacity: 0; }
+            20% { opacity: 0.5; }
+            80% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        header {
+            z-index: 10;
+            transform: skewX(-15deg) rotate(-3deg);
+            animation: extremePulse 1s infinite alternate ease-in-out;
+            margin-top: 5px;
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            text-shadow: 6px 6px 0px var(--kinoko-dark), 
+                         -4px -4px 0px var(--takenoko-dark),
+                         0 0 30px rgba(247, 206, 134, 0.4);
+            color: var(--biscuit);
+            letter-spacing: -2px;
+        }
+
+        @keyframes extremePulse {
+            0% { transform: skewX(-15deg) rotate(-3deg) scale(0.98); }
+            100% { transform: skewX(-13deg) rotate(-1deg) scale(1.03); }
+        }
+
+        .battle-ground {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1400px;
+            height: 75vh;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .teams-container {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            height: 55%;
+            align-items: center;
+        }
+
+        .team-zone {
+            width: 45%;
+            height: 100%;
+            border: 12px solid var(--biscuit);
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-shadow: 0 25px 0px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.5);
+            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .zone-kinoko {
+            background: linear-gradient(135deg, var(--kinoko-main), var(--kinoko-dark));
+            transform: rotate(-1.5deg);
+        }
+
+        .zone-takenoko {
+            background: linear-gradient(135deg, var(--takenoko-main), var(--takenoko-dark));
+            transform: rotate(1.5deg);
+        }
+
+        .team-zone:hover {
+            transform: scale(1.03) rotate(0deg);
+            border-color: #fff;
+            box-shadow: 0 15px 0px var(--accent-gold), 0 25px 25px rgba(255,215,0,0.2);
+        }
+        .team-zone:active { transform: scale(0.97); }
+
+        .image-box {
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(6px 6px 0px #000);
+            animation: iconDance 0.6s infinite alternate ease-in-out;
+        }
+        .zone-takenoko .team-image { animation-delay: 0.3s; }
+
+        @keyframes iconDance {
+            0% { transform: scale(1) rotate(-6deg); }
+            100% { transform: scale(1.08) rotate(6deg); }
+        }
+
+        .team-label {
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 6px 6px 0px #000;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .splat-btn {
+            background: var(--biscuit);
+            color: var(--kinoko-dark);
+            border: none;
+            font-family: inherit;
+            font-size: 2rem;
+            padding: 8px 35px;
+            border-radius: 50px;
+            box-shadow: 0 8px 0px var(--biscuit-shadow), 0 12px 15px rgba(0,0,0,0.5);
+            transform: skewX(-10deg);
+            font-weight: 900;
+            pointer-events: none;
+        }
+        .zone-takenoko .splat-btn { color: var(--takenoko-dark); }
+
+        .bottom-meter-area {
+            width: 100%;
+            max-width: 1200px;
+            height: 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .meter-top-info {
+            width: 96%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .gauge-score {
+            display: flex;
+            flex-direction: column;
+            width: 40%;
+        }
+        .score-kinoko { align-items: flex-start; }
+        .score-takenoko { align-items: flex-end; }
+        
+        .score-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .score-number {
+            font-size: 5rem; 
+            font-weight: 900;
+            text-shadow: 8px 8px 0px #000;
+            line-height: 0.9;
+        }
+        .score-kinoko .score-number { color: var(--biscuit); }
+        .score-takenoko .score-number { color: #e1ffb3; }
+
+        .score-unit {
+            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 4px 4px 0px #000;
+        }
+
+        .percent-badge {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-shadow: 4px 4px 0px #000;
+            color: var(--accent-gold);
+            background: rgba(0,0,0,0.5);
+            padding: 0 10px;
+            border-radius: 10px;
+            transform: skewX(-10deg);
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: #bbb;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+            text-shadow: 3px 3px 0px #000;
+            font-weight: 900;
+        }
+
+        .lead-container {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            width: 200px;
+            height: 50px;
+        }
+
+        .lead-badge {
+            position: absolute;
+            background: var(--accent-gold);
+            color: #000;
+            font-size: 1.3rem;
+            font-weight: 900;
+            padding: 5px 20px;
+            border-radius: 6px;
+            box-shadow: 5px 5px 0 #000;
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+        }
+        #lead-badge-kinoko.lead-active { opacity: 1; transform: scale(1.2) rotate(-6deg) translateX(-40px); }
+        #lead-badge-takenoko.lead-active { opacity: 1; transform: scale(1.2) rotate(6deg) translateX(40px); }
+
+        /* ====== 超・極太ゲージ＆インクアニメーション ====== */
+        .splat-meter-frame-horizontal {
+            width: 100%;
+            height: 180px; 
+            background: #111;
+            border: 16px solid var(--biscuit); 
+            border-radius: 50px; 
+            overflow: hidden;
+            position: relative;
+            transform: skewX(-12deg); 
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 25px 30px rgba(0,0,0,0.6);
+            z-index: 10;
+        }
+
+        .meter-liquid-fill-horizontal {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--takenoko-main),
+                var(--takenoko-main) 40px,
+                var(--takenoko-dark) 40px,
+                var(--takenoko-dark) 80px
+            );
+            background-size: 113px 113px; 
+            animation: inkFlowTakenoko 1.5s linear infinite;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        @keyframes inkFlowTakenoko {
+            0% { background-position: 0 0; }
+            100% { background-position: 113px 0; }
+        }
+
+        .kinoko-liquid-layer-horizontal {
+            height: 100%;
+            width: 50%; 
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--kinoko-main),
+                var(--kinoko-main) 40px,
+                var(--kinoko-dark) 40px,
+                var(--kinoko-dark) 80px
+            );
+            background-size: 113px 113px; 
+            animation: inkFlowKinoko 1.5s linear infinite;
+            position: relative;
+            border-right: 10px solid #fff; 
+            box-shadow: 6px 0 30px rgba(255,255,255,0.9), -6px 0 30px rgba(255,255,255,0.9);
+            transition: width 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        @keyframes inkFlowKinoko {
+            0% { background-position: 0 0; }
+            100% { background-position: -113px 0; }
+        }
+        
+        .kinoko-liquid-layer-horizontal::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            background: rgba(255, 255, 255, 0.6);
+            animation: borderPulse 1s infinite alternate ease-in-out;
+        }
+
+        @keyframes borderPulse {
+            0% { opacity: 0.5; box-shadow: 0 0 15px #fff; }
+            100% { opacity: 1; box-shadow: 0 0 40px #fff, 0 0 50px var(--accent-gold); }
+        }
+        /* ======================================= */
+
+        .footer-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        footer {
+            background: rgba(0,0,0,0.85);
+            padding: 10px 60px;
+            border-radius: 50px;
+            border: 4px solid var(--kinoko-dark);
+            transform: skewX(-15deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.7);
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: #778;
+        }
+
+        .rollback-btn {
+            background: #222;
+            color: #fff;
+            border: 3px solid #666;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 5px 0px #000;
+            transition: 0.1s;
+        }
+        .rollback-btn:hover { background: #444; border-color: #888; }
+        .rollback-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px #000; }
+        .rollback-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .macro-shake { animation: crazyShake 0.4s ease-out; }
+        @keyframes crazyShake {
+            0% { transform: translate(0,0); }
+            20% { transform: translate(-8px, 6px); }
+            40% { transform: translate(10px, -8px); }
+            60% { transform: translate(-6px, -4px); }
+            100% { transform: translate(0,0); }
+        }
+
+        .splat-ink-stain {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+            transform: translate(-50%, -50%) scale(0);
+            animation: inkSplatExplode 0.3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes inkSplatExplode {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+        }
+
+        .ink-droplet {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 51;
+            animation: dropletFly 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes dropletFly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body id="stage">
+
+    <header>
+        <h1 class="main-title">CHOCO SPLAT BATTLE</h1>
+    </header>
+
+    <div class="battle-ground">
+        
+        <div class="teams-container">
+            <div class="team-zone zone-kinoko" id="btn-kinoko">
+                <div class="image-box">
+                    <img src="kinoko.png" alt="きのこ写真" class="team-image">
+                </div>
+                <h2 class="team-label">きのこの山</h2>
+                <button class="splat-btn">SPLAT!</button>
+            </div>
+
+            <div class="team-zone zone-takenoko" id="btn-takenoko">
+                <h2 class="team-label">たけのこの里</h2>
+                <button class="splat-btn">SPLAT!</button>
+                <div class="image-box">
+                    <img src="takenoko.png" alt="たけのこ写真" class="team-image">
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-meter-area">
+            
+            <div class="meter-top-info">
+                <div class="gauge-score score-kinoko">
+                    <span class="score-label">きのこ軍 WINNINGS</span>
+                    <div class="score-wrapper">
+                        <div><span class="score-number" id="txt-kinoko">0</span><span class="score-unit">票</span></div>
+                        <div class="percent-badge" id="pct-kinoko">50%</div>
+                    </div>
+                </div>
+
+                <div class="lead-container">
+                    <div class="lead-badge" id="lead-badge-kinoko">👑 LEAD</div>
+                    <div class="lead-badge" id="lead-badge-takenoko">👑 LEAD</div>
+                </div>
+
+                <div class="gauge-score score-takenoko">
+                    <span class="score-label">たけのこ軍 WINNINGS</span>
+                    <div class="score-wrapper">
+                        <div class="percent-badge" id="pct-takenoko">50%</div>
+                        <div><span class="score-number" id="txt-takenoko">0</span><span class="score-unit">票</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="splat-meter-frame-horizontal">
+                <div class="meter-liquid-fill-horizontal">
+                    <div class="kinoko-liquid-layer-horizontal" id="bar-kinoko"></div>
+                </div>
+            </div>
+            
+        </div>
+
+    </div>
+
+    <div class="footer-container">
+        <button class="rollback-btn" id="btn-rollback" disabled>↩ 1票取り消す</button>
+        <footer>HORIZONTAL SPLAT RESULTER SYSTEM</footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // Firebase同期のオン・オフ
+        const ENABLE_SYNC = false; 
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        let score = { kinoko: 0, takenoko: 0 };
+        let myVoteHistory = []; 
+
+        let dbRef = null;
+
+        if (ENABLE_SYNC) {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            dbRef = ref(db, 'chocobattle/scores');
+
+            onValue(dbRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    score.kinoko = data.kinoko || 0;
+                    score.takenoko = data.takenoko || 0;
+                    calcResult();
+                }
+            });
+        }
+
+        document.getElementById('btn-kinoko').addEventListener('click', (e) => handleVote('kinoko', e));
+        document.getElementById('btn-takenoko').addEventListener('click', (e) => handleVote('takenoko', e));
+        document.getElementById('btn-rollback').addEventListener('click', handleRollback);
+
+        function handleVote(team, event) {
+            myVoteHistory.push(team); 
+            document.getElementById('btn-rollback').disabled = false;
+
+            const stage = document.getElementById('stage');
+            stage.classList.remove('macro-shake');
+            void stage.offsetWidth; 
+            stage.classList.add('macro-shake');
+
+            createChocolateSplat(event.clientX, event.clientY, team);
+
+            if (ENABLE_SYNC) {
+                runTransaction(dbRef, (currentData) => {
+                    if (currentData === null) return { kinoko: 0, takenoko: 0, [team]: 1 };
+                    currentData[team] = (currentData[team] || 0) + 1;
+                    return currentData;
+                });
+            } else {
+                score[team] += 1; 
+                calcResult();
+            }
+        }
+
+        function handleRollback() {
+            if (myVoteHistory.length === 0) return;
+            const lastVote = myVoteHistory.pop(); 
+
+            if (myVoteHistory.length === 0) {
+                document.getElementById('btn-rollback').disabled = true;
+            }
+
+            if (ENABLE_SYNC) {
+                runTransaction(dbRef, (currentData) => {
+                    if (currentData === null) return currentData;
+                    if (currentData[lastVote] > 0) currentData[lastVote] -= 1;
+                    return currentData;
+                });
+            } else {
+                if (score[lastVote] > 0) score[lastVote] -= 1;
+                calcResult();
+            }
+        }
+
+        function calcResult() {
+            const total = score.kinoko + score.takenoko;
+
+            document.getElementById('txt-kinoko').innerText = score.kinoko.toLocaleString();
+            document.getElementById('txt-takenoko').innerText = score.takenoko.toLocaleString();
+
+            const badgeKinoko = document.getElementById('lead-badge-kinoko');
+            const badgeTakenoko = document.getElementById('lead-badge-takenoko');
+            const pctKinokoEl = document.getElementById('pct-kinoko');
+            const pctTakenokoEl = document.getElementById('pct-takenoko');
+            const barKinoko = document.getElementById('bar-kinoko');
+
+            if (total === 0) {
+                barKinoko.style.width = '50%';
+                pctKinokoEl.innerText = '50%';
+                pctTakenokoEl.innerText = '50%';
+                badgeKinoko.classList.remove('lead-active');
+                badgeTakenoko.classList.remove('lead-active');
+                return;
+            }
+
+            const kinokoP = Math.round((score.kinoko / total) * 100);
+            const takenokoP = 100 - kinokoP;
+
+            barKinoko.style.width = ((score.kinoko / total) * 100) + '%';
+            
+            pctKinokoEl.innerText = kinokoP + '%';
+            pctTakenokoEl.innerText = takenokoP + '%';
+
+            if (score.kinoko > score.takenoko) {
+                badgeKinoko.classList.add('lead-active');
+                badgeTakenoko.classList.remove('lead-active');
+            } else if (score.takenoko > score.kinoko) {
+                badgeTakenoko.classList.add('lead-active');
+                badgeKinoko.classList.remove('lead-active');
+            } else {
+                badgeKinoko.classList.remove('lead-active');
+                badgeTakenoko.classList.remove('lead-active');
+            }
+        }
+
+        const particleColors = ['#230f04', '#3d1b08', '#2e7d32', '#f7ce86'];
+        function spawnAmbientParticle() {
+            const stage = document.getElementById('stage');
+            const p = document.createElement('div');
+            p.classList.add('ambient-particle');
+            const size = Math.random() * 35 + 15;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            stage.appendChild(p);
+            setTimeout(() => p.remove(), 6000);
+        }
+        setInterval(spawnAmbientParticle, 800);
+
+        function createChocolateSplat(x, y, team) {
+            const color = team === 'kinoko' ? 'var(--kinoko-dark)' : 'var(--takenoko-main)';
+            const stage = document.getElementById('stage');
+
+            const stain = document.createElement('div');
+            stain.classList.add('splat-ink-stain');
+            stain.style.backgroundColor = color;
+            stain.style.left = x + 'px';
+            stain.style.top = y + 'px';
+            const size = Math.random() * 80 + 70;
+            stain.style.width = size + 'px';
+            stain.style.height = size + 'px';
+            stage.appendChild(stain);
+            setTimeout(() => stain.remove(), 600);
+
+            const droplets = 12;
+            for (let i = 0; i < droplets; i++) {
+                const drop = document.createElement('div');
+                drop.classList.add('ink-droplet');
+                drop.style.backgroundColor = color;
+                drop.style.left = x + 'px';
+                drop.style.top = y + 'px';
+                const dSize = Math.random() * 15 + 8;
+                drop.style.width = dSize + 'px';
+                drop.style.height = dSize + 'px';
+                const angle = (i * (360 / droplets) + Math.random() * 20) * (Math.PI / 180);
+                const dist = Math.random() * 160 + 60;
+                drop.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+                drop.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+                stage.appendChild(drop);
+                setTimeout(() => drop.remove(), 600);
+            }
+        }
+
+        calcResult();
+    </script>
+</body>
+</html>
