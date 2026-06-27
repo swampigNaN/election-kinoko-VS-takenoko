@@ -401,33 +401,6 @@
             100% { transform: translate(0,0); }
         }
 
-        .splat-ink-stain {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 50;
-            transform: translate(-50%, -50%) scale(0);
-            animation: inkSplatExplode 0.3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-        }
-
-        @keyframes inkSplatExplode {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
-        }
-
-        .ink-droplet {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 51;
-            animation: dropletFly 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        }
-
-        @keyframes dropletFly {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
-        }
-
         /* =========================================================
            スマホ向けレスポンシブ（画面幅768px以下の場合）
            ========================================================= */
@@ -631,12 +604,13 @@
             myVoteHistory.push(team); 
             document.getElementById('btn-rollback').disabled = false;
 
+            // 画面を少し揺らすエフェクトは残しています
             const stage = document.getElementById('stage');
             stage.classList.remove('macro-shake');
             void stage.offsetWidth; 
             stage.classList.add('macro-shake');
 
-            createChocolateSplat(event.clientX, event.clientY, team);
+            // インクのエフェクト（createChocolateSplat）は削除しました
 
             if (ENABLE_SYNC) {
                 runTransaction(dbRef, (currentData) => {
@@ -728,6 +702,7 @@
             }
         }
 
+        // 背景を漂う粒子のエフェクトは残しています
         const particleColors = ['#230f04', '#3d1b08', '#2e7d32', '#f7ce86'];
         function spawnAmbientParticle() {
             const stage = document.getElementById('stage');
@@ -743,40 +718,6 @@
             setTimeout(() => p.remove(), 6000);
         }
         setInterval(spawnAmbientParticle, 800);
-
-        function createChocolateSplat(x, y, team) {
-            const color = team === 'kinoko' ? 'var(--kinoko-dark)' : 'var(--takenoko-main)';
-            const stage = document.getElementById('stage');
-
-            const stain = document.createElement('div');
-            stain.classList.add('splat-ink-stain');
-            stain.style.backgroundColor = color;
-            stain.style.left = x + 'px';
-            stain.style.top = y + 'px';
-            const size = Math.random() * 80 + 70;
-            stain.style.width = size + 'px';
-            stain.style.height = size + 'px';
-            stage.appendChild(stain);
-            setTimeout(() => stain.remove(), 600);
-
-            const droplets = 12;
-            for (let i = 0; i < droplets; i++) {
-                const drop = document.createElement('div');
-                drop.classList.add('ink-droplet');
-                drop.style.backgroundColor = color;
-                drop.style.left = x + 'px';
-                drop.style.top = y + 'px';
-                const dSize = Math.random() * 15 + 8;
-                drop.style.width = dSize + 'px';
-                drop.style.height = dSize + 'px';
-                const angle = (i * (360 / droplets) + Math.random() * 20) * (Math.PI / 180);
-                const dist = Math.random() * 160 + 60;
-                drop.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-                drop.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-                stage.appendChild(drop);
-                setTimeout(() => drop.remove(), 600);
-            }
-        }
 
         calcResult();
     </script>
