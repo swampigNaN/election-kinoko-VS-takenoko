@@ -9,9 +9,8 @@
 
         :root {
             --bg-dark: #120600;
-            /* コントラストを強めるために色を調整しました */
-            --kinoko-dark: #140702;     /* より深いビターチョコ色 */
-            --kinoko-main: #6b3114;     /* より明るいミルクチョコ色 */
+            --kinoko-dark: #140702;
+            --kinoko-main: #6b3114;
             --takenoko-dark: #1b4d22;
             --takenoko-main: #2e7d32;   
             --biscuit: #f7ce86;
@@ -35,7 +34,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 40px;
             padding: 20px;
             position: relative;
         }
@@ -75,28 +75,6 @@
             20% { opacity: 0.5; }
             80% { opacity: 0.5; }
             100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
-        }
-
-        header {
-            z-index: 10;
-            transform: skewX(-15deg) rotate(-3deg);
-            animation: extremePulse 1s infinite alternate ease-in-out;
-            margin-top: 5px;
-        }
-
-        .main-title {
-            font-size: 4rem;
-            font-weight: 900;
-            text-shadow: 6px 6px 0px var(--kinoko-dark), 
-                         -4px -4px 0px var(--takenoko-dark),
-                         0 0 30px rgba(247, 206, 134, 0.4);
-            color: var(--biscuit);
-            letter-spacing: -2px;
-        }
-
-        @keyframes extremePulse {
-            0% { transform: skewX(-15deg) rotate(-3deg) scale(0.98); }
-            100% { transform: skewX(-13deg) rotate(-1deg) scale(1.03); }
         }
 
         .battle-ground {
@@ -185,7 +163,7 @@
             color: var(--kinoko-dark);
             border: none;
             font-family: inherit;
-            font-size: 2rem;
+            font-size: 2.5rem;
             padding: 8px 35px;
             border-radius: 50px;
             box-shadow: 0 8px 0px var(--biscuit-shadow), 0 12px 15px rgba(0,0,0,0.5);
@@ -443,10 +421,6 @@
 </head>
 <body id="stage">
 
-    <header>
-        <h1 class="main-title">CHOCO SPLAT BATTLE</h1>
-    </header>
-
     <div class="battle-ground">
         
         <div class="teams-container">
@@ -455,12 +429,12 @@
                     <img src="kinoko.png" alt="きのこ写真" class="team-image">
                 </div>
                 <h2 class="team-label">きのこの山</h2>
-                <button class="splat-btn">SPLAT!</button>
+                <button class="splat-btn">投票</button>
             </div>
 
             <div class="team-zone zone-takenoko" id="btn-takenoko">
                 <h2 class="team-label">たけのこの里</h2>
-                <button class="splat-btn">SPLAT!</button>
+                <button class="splat-btn">投票</button>
                 <div class="image-box">
                     <img src="takenoko.png" alt="たけのこ写真" class="team-image">
                 </div>
@@ -504,24 +478,28 @@
 
     <div class="footer-container">
         <button class="rollback-btn" id="btn-rollback" disabled>↩ 1票取り消す</button>
-        <footer>HORIZONTAL SPLAT RESULTER SYSTEM</footer>
+        <footer>VOTE RESULT SYSTEM</footer>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // Firebase同期のオン・オフ
-        const ENABLE_SYNC = false; 
+        // ==========================================
+        // Firebase同期を有効化！
+        // ==========================================
+        const ENABLE_SYNC = true; 
 
+        // ご提示いただいた設定を組み込みました
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyD6_zG0RElcpgS_755xfJTa02W6szeebI0",
+            authDomain: "election-47a58.firebaseapp.com",
+            databaseURL: "https://election-47a58-default-rtdb.firebaseio.com",
+            projectId: "election-47a58",
+            storageBucket: "election-47a58.firebasestorage.app",
+            messagingSenderId: "242994159107",
+            appId: "1:242994159107:web:68bf8fa9ea7fc737f7f836",
+            measurementId: "G-SJ6YBCRW4V"
         };
 
         let score = { kinoko: 0, takenoko: 0 };
